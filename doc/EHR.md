@@ -8,15 +8,18 @@
 | Pablo Pazos Gutierrez <pablo.pazos@cabolabs.com> | 0.3   (2020-04-07)   | Updated data sets for create EHR.                                                            |
 | Pablo Pazos Gutierrez <pablo.pazos@cabolabs.com> | 0.4   (2021-04-19)   | Refactored data sets for create EHR. Improved description of the flows, grammar and comments |
 | Pablo Pazos Gutierrez <pablo.pazos@cabolabs.com> | 0.4.1 (2022-02-11)   | Clarified test data sets and test cases related to subject_id / subject.external_ref         |
+| Pablo Pazos Gutierrez <pablo.pazos@cabolabs.com> | 0.4.2 (2023-01-31)   | Simplified B.1.b flow  |
 
 
 # Index
-<!-- 
+<!--
   $ git clone https://github.com/Chris3606/TOC-Generator
   $ cd TOC-Generator
   $ python tocgen.py ../ehrbase/doc/conformance_testing
 -->
 <!--ts-->
+- [openEHR Conformance Testing Specification (EHR)](#openehr-conformance-testing-specification-ehr)
+- [Index](#index)
 - [EHR Validation Suite](#ehr-validation-suite)
   - [A. General Requirements](#a-general-requirements)
   - [B. EHR Service Test Cases](#b-ehr-service-test-cases)
@@ -26,16 +29,16 @@
       - [B.1.c. Alternative flow 2: Create two EHRs for the same patient](#b1c-alternative-flow-2-create-two-ehrs-for-the-same-patient)
     - [B.2. Has EHR](#b2-has-ehr)
       - [B.2.a. Main flow: Check has EHR with existing EHR](#b2a-main-flow-check-has-ehr-with-existing-ehr)
-      - [B.2.b. Alternative flow 1: Check has EHR with existing EHR by subject_id](#b2b-alternative-flow-1-check-has-ehr-with-existing-ehr-by-subject_id)
+      - [B.2.b. Alternative flow 1: Check has EHR with existing EHR by subject\_id](#b2b-alternative-flow-1-check-has-ehr-with-existing-ehr-by-subject_id)
       - [B.2.c. Alternative flow 2: Check has EHR with non existing EHR](#b2c-alternative-flow-2-check-has-ehr-with-non-existing-ehr)
-      - [B.2.d. Alternative flow 3: Check has EHR with non existing EHR by subject_id](#b2d-alternative-flow-3-check-has-ehr-with-non-existing-ehr-by-subject_id)
+      - [B.2.d. Alternative flow 3: Check has EHR with non existing EHR by subject\_id](#b2d-alternative-flow-3-check-has-ehr-with-non-existing-ehr-by-subject_id)
     - [B.3. Get EHR](#b3-get-ehr)
       - [B.3.a. Main flow: Get existing EHR](#b3a-main-flow-get-existing-ehr)
-      - [B.3.b. Alternative flow 1: Get existing EHR by subject_id](#b3b-alternative-flow-1-get-existing-ehr-by-subject_id)
+      - [B.3.b. Alternative flow 1: Get existing EHR by subject\_id](#b3b-alternative-flow-1-get-existing-ehr-by-subject_id)
       - [B.3.c. Alternative flow 2: Get non existing EHR](#b3c-alternative-flow-2-get-non-existing-ehr)
-      - [B.3.d. Alternative flow 3: Get non existing EHR by subject_id](#b3d-alternative-flow-3-get-non-existing-ehr-by-subject_id)
-  - [C. EHR_STATUS Test Cases](#c-ehr_status-test-cases)
-    - [C.1. Get EHR_STATUS](#c1-get-ehr_status)
+      - [B.3.d. Alternative flow 3: Get non existing EHR by subject\_id](#b3d-alternative-flow-3-get-non-existing-ehr-by-subject_id)
+  - [C. EHR\_STATUS Test Cases](#c-ehr_status-test-cases)
+    - [C.1. Get EHR\_STATUS](#c1-get-ehr_status)
       - [C.1.a. Main flow: Get status of an existing EHR](#c1a-main-flow-get-status-of-an-existing-ehr)
       - [C.1.b. Alternative flow 1: Get status of a non existing EHR](#c1b-alternative-flow-1-get-status-of-a-non-existing-ehr)
     - [C.2. Set EHR Queryable](#c2-set-ehr-queryable)
@@ -97,7 +100,7 @@ These are the data set classes:
 
 **Valid test data sets when the EHR_STATUS is provided and internal strucrures are valid (data set class 1.2):**
 
-| No. | is_queryable | is_modifiable | subject.external_ref | other_details | ehr_id       |
+| #   | is_queryable | is_modifiable | subject.external_ref | other_details | ehr_id       |
 | --- | ------------ | ------------- | -------------------- | ------------- | ------------ |
 | 1   | true         | true          | provided             | not provided  | not provided |
 | 2   | true         | false         | provided             | not provided  | not provided |
@@ -186,13 +189,10 @@ A new EHR will exist in the system, the first one created, and be consistent wit
 
 **Flow:**
 
-1. Invoke the create EHR service
-   1. for each VALID data set not providing ehr_id
-   2. for each VALID data set providing ehr_id
+1. Invoke the create EHR service for each valid data set
 2. The server should answer with a positive response associated to the successful EHR creation
-3. Invoke the create EHR service
-   1. with the same ehr_id of the EHR created in 1.1. (should be read from the response)
-   2. with the same ehr_id of the EHR created in 1.2. (should be read from the test data sets)
+3. Invoke the create EHR service with the same ehr_id of the EHR created in 1. (should be read from the response)
+   1. Note: if the data set defines a subject_id, it shouldn't be used to avoid making this case fail because of the patient already having an EHR, that is tested in the next case B.1.c
 4. The server should answer with a negative response, related to the existence of an EHR with the provided ehr_id, because ehr_id values should be unique
 
 
@@ -530,6 +530,3 @@ None
 
 1. Invoke the clear EHR modifiable service by a random ehr_id
 2. The result should be negative and the result should include an error related to "EHR with ehr_id doesn't exist".
-
-
-
