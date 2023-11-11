@@ -1,0 +1,260 @@
+{
+  "people": [
+    {
+      "id": 1,
+      "name": "Mauro",
+      "parents": [],
+      "sex": "M",
+      "dob": "1892-06-20",
+      "nid": "111111"
+    },
+    {
+      "id": 2,
+      "name": "Paz",
+      "parents": [],
+      "sex": "F",
+      "dob": "1901-07-21",
+      "nid": "222222"
+    },
+    {
+      "id": 3,
+      "name": "Rodrigo",
+      "parents": [1,2],
+      "sex": "M",
+      "dob": "1922-04-15",
+      "nid": "333333"
+    },
+    {
+      "id": 4,
+      "name": "Esther",
+      "parents": [1,2],
+      "sex": "F",
+      "dob": "1930-05-16",
+      "nid": "444444"
+    },
+    {
+      "id": 5,
+      "name": "Andres",
+      "parents": [],
+      "sex": "M",
+      "dob": "1899-10-23",
+      "nid": "555555"
+    },
+    {
+      "id": 6,
+      "name": "Julia",
+      "parents": [],
+      "sex": "F",
+      "dob": "1903-08-24",
+      "nid": "666666"
+    },
+    {
+      "id": 7,
+      "name": "Enrique",
+      "parents": [5,6],
+      "sex": "M",
+      "dob": "1929-06-17",
+      "nid": "777777"
+    },
+    {
+      "id": 8,
+      "name": "Diego",
+      "parents": [4,7],
+      "sex": "M",
+      "dob": "1953-07-18",
+      "nid": "888888"
+    },
+    {
+      "id": 9,
+      "name": "Barbara",
+      "parents": [4,7],
+      "sex": "F",
+      "dob": "1955-08-19",
+      "nid": "999999"
+    },
+    {
+      "id": 10,
+      "name": "Camila",
+      "parents": [],
+      "sex": "F",
+      "dob": "1957-09-20",
+      "nid": "10101010"
+    },
+    {
+      "id": 11,
+      "name": "Walter",
+      "parents": [10,8],
+      "sex": "M",
+      "dob": "1981-10-24",
+      "nid": "11111111"
+    },
+    {
+      "id": 12,
+      "name": "Graciela",
+      "parents": [10,8],
+      "sex": "F",
+      "dob": "1983-11-02",
+      "nid": "12121212"
+    },
+    {
+      "id": 13,
+      "name": "Claudia",
+      "parents": [],
+      "sex": "F",
+      "dob": "1989-03-19",
+      "nid": "13131313"
+    },
+    {
+      "id": 14,
+      "name": "Magdalena",
+      "parents": [13,11],
+      "sex": "F",
+      "dob": "2022-04-03",
+      "nid": "14141414"
+    },
+    {
+      "id": 15,
+      "name": "Carlos",
+      "parents": [],
+      "sex": "M",
+      "dob": "1900-01-26",
+      "nid": "15151515"
+    },
+    {
+      "id": 16,
+      "name": "Mariana",
+      "parents": [],
+      "sex": "F",
+      "dob": "1904-09-25",
+      "nid": "16161616"
+    },
+    {
+      "id": 17,
+      "name": "Juan",
+      "parents": [15,16],
+      "sex": "M",
+      "dob": "1935-12-25",
+      "nid": "17171717"
+    },
+    {
+      "id": 18,
+      "name": "Alejandro",
+      "parents": [17,9],
+      "sex": "M",
+      "dob": "1987-01-29",
+      "nid": "18181818"
+    },
+    {
+      "id": 19,
+      "name": "Mercedes",
+      "parents": [17,9],
+      "sex": "F",
+      "dob": "1999-02-28",
+      "nid": "19191919"
+    },
+    {
+      "id": 20,
+      "name": "Emilio",
+      "parents": [],
+      "sex": "M",
+      "dob": "1901-10-27",
+      "nid": "20202020"
+    },
+    {
+      "id": 21,
+      "name": "Renata",
+      "parents": [],
+      "sex": "F",
+      "dob": "1903-11-28",
+      "nid": "21212121"
+    },
+    {
+      "id": 22,
+      "name": "Jose",
+      "parents": [20,21],
+      "sex": "M",
+      "dob": "1929-10-25",
+      "nid": "22222222"
+    },
+    {
+      "id": 23,
+      "name": "Soledad",
+      "parents": [20,21],
+      "sex": "F",
+      "dob": "1931-09-24",
+      "nid": "23232323"
+    },
+    {
+      "id": 24,
+      "name": "Alberto",
+      "parents": [],
+      "sex": "M",
+      "dob": "1930-08-23",
+      "nid": "24242424"
+    },
+    {
+      "id": 25,
+      "name": "Monica",
+      "parents": [23,24],
+      "sex": "F",
+      "dob": "1964-11-26",
+      "nid": "25252525"
+    },
+    {
+      "id": 26,
+      "name": "Berta",
+      "parents": [25,17],
+      "sex": "F",
+      "dob": "1994-12-27",
+      "nid": "26262626"
+    },
+    {
+      "id": 27,
+      "name": "Dario",
+      "parents": [],
+      "sex": "M",
+      "dob": "1898-12-28",
+      "nid": "27272727"
+    },
+    {
+      "id": 28,
+      "name": "Gladis",
+      "parents": [],
+      "sex": "F",
+      "dob": "1904-12-21",
+      "nid": "28282828"
+    },
+    {
+      "id": 29,
+      "name": "Maximiliano",
+      "parents": [27,28],
+      "sex": "M",
+      "dob": "1921-01-11",
+      "nid": "29292929"
+    },
+    {
+      "id": 30,
+      "name": "Paula",
+      "parents": [27,28],
+      "sex": "F",
+      "dob": "1929-02-12",
+      "nid": "30303030"
+    },
+    {
+      "id": 31,
+      "name": "Xavier",
+      "parents": [],
+      "sex": "M",
+      "dob": "1928-03-13",
+      "nid": "31313131"
+    },
+    {
+      "id": 32,
+      "name": "Juana",
+      "parents": [30,31],
+      "sex": "F",
+      "dob": "1955-03-14",
+      "nid": "32323232"
+    }
+  ]
+}
