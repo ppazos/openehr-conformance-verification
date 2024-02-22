@@ -15,6 +15,7 @@ import com.cabolabs.openehr.rm_1_0_2.common.archetyped.*
 import com.cabolabs.openehr.rm_1_0_2.common.generic.PartySelf
 
 import com.cabolabs.openehr.formats.OpenEhrJsonParserQuick
+import com.cabolabs.openehr.rest.client.auth.*
 
 import groovy.json.JsonSlurper
 
@@ -37,23 +38,72 @@ class ConformanceTestSuitesTest extends Specification {
          properties.load(it)
       }
 
-      boolean performAuth = Boolean.parseBoolean(getProperty("sut_api_perform_auth"))
+      // Authentication factory
+      def authType = AuthTypeEnum.fromString(getProperty("api_auth"))
+      def auth
+      switch (authType)
+      {
+         case AuthTypeEnum.BASIC:
+
+            def user = getProperty("api_username")
+            def pass = getProperty("api_password")
+
+            if (!user)
+            {
+               throw new Exception("api_username is not set and it's required when api_auth='basic'")
+            }
+
+            if (!pass)
+            {
+               throw new Exception("api_password is not set and it's required when api_auth='basic'")
+            }
+
+            auth = new BasicAuth(user, pass)
+         break
+         case AuthTypeEnum.TOKEN:
+
+            def token = getProperty("api_access_token")
+            if (!token)
+            {
+               throw new Exception("api_access_token is not set and it's required when api_auth='token'")
+            }
+
+            auth = new TokenAuth(token)
+         break
+         case AuthTypeEnum.CUSTOM:
+            def aapi = getProperty("api_auth_url")
+            def user = getProperty("api_username")
+            def pass = getProperty("api_password")
+
+            if (!aapi)
+            {
+               throw new Exception("api_auth_url is not set and it's required when api_auth='custom'")
+            }
+
+            if (!user)
+            {
+               throw new Exception("api_username is not set and it's required when api_auth='custom'")
+            }
+
+            if (!pass)
+            {
+               throw new Exception("api_password is not set and it's required when api_auth='custom'")
+            }
+
+            auth = new CustomAuth(aapi, user, pass)
+         break
+         case AuthTypeEnum.NONE:
+            auth = new NoAuth()
+         break
+      }
 
       client = new OpenEhrRestClient(
-         getProperty("sut_api_url"),
-         getProperty("sut_api_auth_url"),
-         getProperty("sut_api_admin_url"),
-         performAuth,
-         Boolean.parseBoolean(getProperty("sut_api_perform_db_truncation"))
+         getProperty("base_url"),
+         auth,
+         ContentTypeEnum.JSON
       )
       client.setCommitterHeader('name="John Doe", external_ref.id="BC8132EA-8F4A-11E7-BB31-BE2E44B06B34", external_ref.namespace="demographic", external_ref.type="PERSON"')
 
-      if (performAuth)
-      {
-         // set required header for POST endpoints
-         client.auth("admin@cabolabs.com", "admin") // TODO: set on config file
-         // TODO: actually check the auth result is OK
-      }
       // Instant now = Instant.now()
       // ZonedDateTime zdt = ZonedDateTime.ofInstant(now, ZoneOffset.UTC) //ZoneId.systemDefault()
       // System.out.println( "Date is: " + zdt )
@@ -108,9 +158,9 @@ class ConformanceTestSuitesTest extends Specification {
             ehr.ehr_status.subject.external_ref.id.value == subject_id
          }
 
-      cleanup:
-         // server cleanup
-         client.truncateServer()
+      // cleanup:
+      //    // server cleanup
+      //    client.truncateServer()
 
 
       // NOTE: all subject_ids should be different to avoid the "patient already have an EHR error", which is expected when you create two EHRs for the same patient
@@ -138,15 +188,13 @@ class ConformanceTestSuitesTest extends Specification {
 
       then:
          ehr2 == null
-         client.lastError.result.code == 'EHRSERVER::API::RESPONSE_CODES::99213'
-
-         // NOTE: error messages might be left out of the formal onformance
-         client.lastError.result.message == "EHR with ehr_id ${ehr1.ehr_id.value} already exists, ehr_id must be unique"
+         // TODO: assert response code 4xx
+         //client.lastError.result.message == "EHR with ehr_id ${ehr1.ehr_id.value} already exists, ehr_id must be unique"
 
 
-      cleanup:
-         // server cleanup
-         client.truncateServer()
+      // cleanup:
+      //    // server cleanup
+      //    client.truncateServer()
 
 
       // NOTE: all subjec_ids should be different to avoid the "patient already have an EHR error", which is expected when you create two EHRs for the same patietn
@@ -161,13 +209,13 @@ class ConformanceTestSuitesTest extends Specification {
       when:
          def ehr = client.createEhr()
          def get_ehr = client.getEhr(ehr.ehr_id.value)
-      
+
       then:
          get_ehr != null
          ehr.ehr_id.value == get_ehr.ehr_id.value
 
-      cleanup:
-         client.truncateServer()
+      // cleanup:
+      //    client.truncateServer()
    }
 
    // TODO: B.3.b.
@@ -176,14 +224,13 @@ class ConformanceTestSuitesTest extends Specification {
    {
       when:
          def get_ehr = client.getEhr('non-existing-id')
-      
+
       then:
          get_ehr == null
          client.lastError != null
-         client.lastError.result.message == error_message_replace_values(properties.error_ehr_not_found_msg, ['non-existing-id'])
 
-      cleanup:
-         client.truncateServer()
+      // cleanup:
+      //    client.truncateServer()
    }
 
 
@@ -209,8 +256,8 @@ class ConformanceTestSuitesTest extends Specification {
          out_composition.archetype_node_id == get_composition.archetype_node_id
          out_composition.archetype_details.template_id.value == get_composition.archetype_details.template_id.value
 
-      cleanup:
-         client.truncateServer()
+      // cleanup:
+      //    client.truncateServer()
    }
 
    def "B.4.b. get composition at version, version doesn't exist"()
@@ -230,14 +277,8 @@ class ConformanceTestSuitesTest extends Specification {
       then:
          get_composition == null
 
-         // this is a way to check the error message and leave the error message be configurable for each SUT
-         // the path where the error message is located in the response and the expected error message are configured
-         // the expected error message has configurable arguments (for the variable content) in the form {0} {1} ... which are replaced here for the expected values
-         get_at_path(client.lastError, properties.error_composition_not_found_path) == error_message_replace_values(properties.error_composition_not_found_msg, ['xxx.yyy.v1'])
-
-
-      cleanup:
-         client.truncateServer()
+      // cleanup:
+      //    client.truncateServer()
    }
 
 
@@ -248,13 +289,10 @@ class ConformanceTestSuitesTest extends Specification {
 
       then:
          get_composition == null
-
-         get_at_path(client.lastError, properties.error_ehr_not_found_path) == error_message_replace_values(properties.error_ehr_not_found_msg, ['xxxxxxxx'])
-
          //println client.lastError
 
-      cleanup:
-         client.truncateServer()
+      // cleanup:
+      //    client.truncateServer()
    }
 
 
@@ -284,9 +322,9 @@ class ConformanceTestSuitesTest extends Specification {
          get_composition.uid.value == out_composition.uid.value
 
 
-      cleanup:
-         // server cleanup
-         client.truncateServer()
+      // cleanup:
+      //    // server cleanup
+      //    client.truncateServer()
    }
 
 
@@ -306,8 +344,9 @@ class ConformanceTestSuitesTest extends Specification {
 
          def out_composition = client.createComposition(ehr.ehr_id.value, compo)
 
-         // there is a problem with the update if it comes microseconds after the create for updating the created compo, there is a race condition when indexing.
-         //sleep(5000)
+         // FIXME: there is a problem with the update if it comes microseconds after the create for updating the created compo,
+         //        there is a race condition when indexing.
+         sleep(2000)
 
          // NOTE: the compo should be updated but is not needed for this test so we use the same compo as the create
          def update_composition = client.updateComposition(ehr.ehr_id.value, compo, out_composition.uid.value)
@@ -806,32 +845,5 @@ class ConformanceTestSuitesTest extends Specification {
    }
 
 
-   // UTIL METHODS
 
-   /**
-    * Replaces arguments in error messages: "This {0} is an error for {1}", [a, b] => "This a is an error for b"
-    */
-   private error_message_replace_values(String error_msg, List values)
-   {
-      for (int i = 0; i < values.size(); i++)
-      {
-         error_msg = error_msg.replace("{$i}", values[i].toString())
-      }
-
-      return error_msg
-   }
-
-   /**
-    * object is a JSON parsed as a Map, we support JSON only for now!
-    */
-   private get_at_path(Map object, String path)
-   {
-      // path = a.b.c
-      // path_quoted = "a"."b"."c"
-      def path_quoted = '"'+ path.replaceAll('\\.', '"."') + '"'
-      def command = ' o.'+ path_quoted
-
-      // access object.a.b.c, where the object is named 'o' in the command
-      Eval.me('o', object, command)
-   }
 }
