@@ -30,7 +30,7 @@ dependencies {
 
     implementation 'com.github.ppazos:openEHR-OPT:v1.9.24'
 
-    implementation "com.github.ppazos:openehr-rest-client:v0.2.5"
+    implementation "com.github.ppazos:openehr-rest-client:v0.2.6"
 
     implementation 'log4j:log4j:1.2.17'
 }

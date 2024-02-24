@@ -145,7 +145,10 @@ class ConformanceTestSuitesTest extends Specification {
          def ehr = create_ehr(data_set_no, is_queryable, is_modifiable, has_status, subject_id, other_details, ehr_id)
 
       then:
+         // TODO: log.error
          if (!ehr) println client.lastError
+
+         client.lastResponseCode == 201
 
          ehr != null
          ehr.ehr_status != null
@@ -183,13 +186,15 @@ class ConformanceTestSuitesTest extends Specification {
          // ehr_status is an object_ref
          ehr1.ehr_status.uid != null
 
+         client.lastResponseCode == 201
+
       when:
          def ehr2 = create_ehr(data_set_no, is_queryable, is_modifiable, has_status, null, other_details, ehr1.ehr_id.value)
 
       then:
          ehr2 == null
-         // TODO: assert response code 4xx
-         //client.lastError.result.message == "EHR with ehr_id ${ehr1.ehr_id.value} already exists, ehr_id must be unique"
+
+         client.lastResponseCode == 409
 
 
       // cleanup:
@@ -202,13 +207,16 @@ class ConformanceTestSuitesTest extends Specification {
          [data_set_no, is_queryable, is_modifiable, has_status, subject_id, other_details, ehr_id] << valid_cases()
    }
 
-
-
    def "B.3.a. get existing ehr"()
    {
       when:
          def ehr = client.createEhr()
+
+         client.lastResponseCode == 201
+
          def get_ehr = client.getEhr(ehr.ehr_id.value)
+
+         client.lastResponseCode == 200
 
       then:
          get_ehr != null
@@ -225,6 +233,8 @@ class ConformanceTestSuitesTest extends Specification {
       when:
          def get_ehr = client.getEhr('non-existing-id')
 
+         client.lastResponseCode == 404
+
       then:
          get_ehr == null
          client.lastError != null
@@ -232,7 +242,6 @@ class ConformanceTestSuitesTest extends Specification {
       // cleanup:
       //    client.truncateServer()
    }
-
 
 
    def "B.4.a. get composition at version"()
@@ -243,12 +252,22 @@ class ConformanceTestSuitesTest extends Specification {
 
          client.uploadTemplate(opt)
 
+         // TODO: for expecting 201 we need to change the template_id each time or clean the server
+         [201, 409].contains(client.lastResponseCode)
+
          def parser = new OpenEhrJsonParserQuick()
          def compo = parser.parseJson(json_compo)
          def ehr = client.createEhr()
 
+         client.lastResponseCode == 201
+
          def out_composition = client.createComposition(ehr.ehr_id.value, compo)
+
+         client.lastResponseCode == 201
+
          def get_composition = client.getComposition(ehr.ehr_id.value, out_composition.uid.value)
+
+         client.lastResponseCode == 200
 
       then:
          get_composition != null
@@ -268,11 +287,17 @@ class ConformanceTestSuitesTest extends Specification {
 
          client.uploadTemplate(opt)
 
+         [201, 409].contains(client.lastResponseCode)
+
          def parser = new OpenEhrJsonParserQuick()
          def compo = parser.parseJson(json_compo)
          def ehr = client.createEhr()
 
+         client.lastResponseCode == 201
+
          def get_composition = client.getComposition(ehr.ehr_id.value, 'xxx.yyy.v1')
+
+         client.lastResponseCode == 404
 
       then:
          get_composition == null
@@ -289,7 +314,8 @@ class ConformanceTestSuitesTest extends Specification {
 
       then:
          get_composition == null
-         //println client.lastError
+
+         client.lastResponseCode == 404
 
       // cleanup:
       //    client.truncateServer()
@@ -306,14 +332,22 @@ class ConformanceTestSuitesTest extends Specification {
 
          client.uploadTemplate(opt)
 
+         [201, 409].contains(client.lastResponseCode)
+
          def parser = new OpenEhrJsonParserQuick()
          def compo = parser.parseJson(json_compo)
          def ehr = client.createEhr()
 
+         client.lastResponseCode == 201
+
          def out_composition = client.createComposition(ehr.ehr_id.value, compo)
+
+         client.lastResponseCode == 201
 
          // check the compo exists in the server
          def get_composition = client.getComposition(ehr.ehr_id.value, out_composition.uid.value)
+
+         client.lastResponseCode == 200
 
       then:
          out_composition != null
@@ -338,14 +372,22 @@ class ConformanceTestSuitesTest extends Specification {
 
          client.uploadTemplate(opt)
 
+         [201, 409].contains(client.lastResponseCode)
+
          def parser = new OpenEhrJsonParserQuick()
          def compo = parser.parseJson(json_compo)
          def ehr = client.createEhr()
 
+         client.lastResponseCode == 201
+
          def out_composition = client.createComposition(ehr.ehr_id.value, compo)
+
+         client.lastResponseCode == 201
 
          // NOTE: the compo should be updated but is not needed for this test so we use the same compo as the create
          def update_composition = client.updateComposition(ehr.ehr_id.value, compo, out_composition.uid.value)
+
+         client.lastResponseCode == 200
 
       then:
          out_composition != null
