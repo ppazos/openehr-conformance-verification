@@ -28,9 +28,9 @@ dependencies {
     // Use the awesome Spock testing and specification framework
     testImplementation 'org.spockframework:spock-core:2.3-groovy-3.0'
 
-    implementation 'com.github.ppazos:openEHR-OPT:v1.9.24'
+    implementation 'com.github.ppazos:openEHR-OPT:v1.9.25'
 
-    implementation "com.github.ppazos:openehr-rest-client:v0.2.7"
+    implementation "com.github.ppazos:openehr-rest-client:v0.3.0"
 
     implementation 'log4j:log4j:1.2.17'
 }
