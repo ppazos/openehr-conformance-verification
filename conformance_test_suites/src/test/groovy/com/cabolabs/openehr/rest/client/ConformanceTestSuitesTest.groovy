@@ -411,6 +411,7 @@ class ConformanceTestSuitesTest extends Specification {
 
       if (has_status)
       {
+         // FIXME: need to upload the OPT for this EHR_STATUS first!
          def status = new EhrStatus()
          status.name = new DvText(value:"Generic Status")
          status.archetype_node_id = "openEHR-EHR-EHR_STATUS.generic.v1"
